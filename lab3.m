@@ -1,36 +1,55 @@
-% Define a signal x[n] = [1, 2, 3, 4] starting at n=0
-x_orig = [1, 2, 3, 4];
-n_orig = 0:3;
+clc;
+clear;
+close all;
 
-% To decompose, we need a symmetric time axis that covers both n and -n
-% So we need n from -3 to 3
-n = -3:3;
-x = zeros(1, length(n));
-% Put our original signal into this larger window
-% x will be [0, 0, 0, 1, 2, 3, 4] for n = [-3, -2, -1, 0, 1, 2, 3]
-x(n >= 0 & n <= 3) = x_orig;
+% 1. Define a symmetric time axis centered around 0
+n_axis = -3:3; 
 
-% 1. Reverse the signal: x[-n]
-x_rev = fliplr(x);
+% 2. Define your signal x[n] on this axis 
+% Let's place [1, 2, 3, 4] starting at n = 0
+x = [0, 0, 0, 1, 2, 3, 4]; 
 
-% 2. Decompose
-x_even = (x + x_rev) / 2;
-x_odd = (x - x_rev) / 2;
+% 3. Create the true time-reversed signal x[-n]
+x_rev = fliplr(x); 
 
-% 3. Verify
-x_reconstructed = x_even + x_odd;
+% 4. Perform Even and Odd Decomposition
+even_com = (x + x_rev) / 2;
+odd_com  = (x - x_rev) / 2;
 
-% --- Plotting ---
-figure('Name', 'Even and Odd Decomposition');
+% 5. Reconstruct to verify
+reconstructed = even_com + odd_com;
 
-subplot(2, 2, 1);
-stem(n, x, 'filled'); title('Original x[n]'); grid on;
+% =========================================================
+%                     VISUALIZATION
+% =========================================================
+figure('Name', 'Even and Odd Decomposition', 'NumberTitle', 'off');
 
-subplot(2, 2, 2);
-stem(n, x_even, 'filled', 'g'); title('Even Component x_e[n]'); grid on;
+% Original Signal
+subplot(3,2,1);
+stem(n_axis, x, 'filled', 'LineWidth', 1.5);
+title('Original Signal x[n]');
+xlabel('n'); ylabel('Amplitude');
 
-subplot(2, 2, 3);
-stem(n, x_odd, 'filled', 'r'); title('Odd Component x_o[n]'); grid on;
+% Time-Reversed Signal
+subplot(3,2,2);
+stem(n_axis, x_rev, 'filled', 'LineWidth', 1.5);
+title('Time-Reversed Signal x[-n]');
+xlabel('n'); ylabel('Amplitude');
 
-subplot(2, 2, 4);
-stem(n, x_reconstructed, 'filled', 'm'); title('Verified: x_e + x_o'); grid on;
+% Even Component (Symmetric around n=0)
+subplot(3,2,3);
+stem(n_axis, even_com, 'r', 'filled', 'LineWidth', 1.5);
+title('Even Component x_{even}[n]');
+xlabel('n'); ylabel('Amplitude');
+
+% Odd Component (Anti-symmetric around n=0, value at n=0 is always 0)
+subplot(3,2,4);
+stem(n_axis, odd_com, 'g', 'filled', 'LineWidth', 1.5);
+title('Odd Component x_{odd}[n]');
+xlabel('n'); ylabel('Amplitude');
+
+% Reconstructed Signal (Should exactly match original)
+subplot(3,2,5);
+stem(n_axis, reconstructed, 'm', 'filled', 'LineWidth', 1.5);
+title('Reconstructed Signal (Even + Odd)');
+xlabel('n'); ylabel('Amplitude');
