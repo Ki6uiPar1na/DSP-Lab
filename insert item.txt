@@ -1,0 +1,7 @@
+% Insertion at the beginning (simplest implementation)
+insert_elem(X, List, [X | List]).
+
+% Alternatively, insertion at any position:
+insert_anywhere(X, List, [X | List]).
+insert_anywhere(X, [Head | Tail], [Head | ResultTail]) :-
+    insert_anywhere(X, Tail, ResultTail).

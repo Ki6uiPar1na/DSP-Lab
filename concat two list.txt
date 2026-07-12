@@ -1,0 +1,6 @@
+% Base case: concatenating an empty list with List2 yields List2
+concat_lists([], List2, List2).
+
+% Recursive case
+concat_lists([Head | Tail], List2, [Head | ResultTail]) :-
+    concat_lists(Tail, List2, ResultTail).

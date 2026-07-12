@@ -1,0 +1,18 @@
+% Main predicate to read and print a file's contents
+read_from_file(FileName) :-
+    see(FileName),                       % Open file for reading
+    read_terms,                          % Start the reading loop
+    seen.                                % Close the file stream
+
+% Helper loop to read terms recursively
+read_terms :-
+    read(Term),                          % Read the next Prolog term
+    process_term(Term).                  % Decide what to do with it
+
+% Base case: Stop when end of file is reached
+process_term(end_of_file) :- !.
+
+% Recursive case: Print the term and continue reading
+process_term(Term) :-
+    write('Read term: '), write(Term), nl,
+    read_terms.                          % Loop to the next term

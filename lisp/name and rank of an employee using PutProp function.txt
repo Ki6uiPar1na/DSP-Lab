@@ -1,0 +1,13 @@
+;; Standard Common Lisp approach:
+(setf (get 'employee1 'name) "John Doe")
+(setf (get 'employee1 'rank) "Senior Engineer")
+
+;; Custom putprop implementation to explicitly match legacy behavior:
+(defun putprop (sym val prop)
+  (setf (get sym prop) val))
+
+(putprop 'employee2 "Alice Smith" 'name)
+(putprop 'employee2 "Manager" 'rank)
+
+;; Displaying the properties:
+(format t "Employee Name: ~A, Rank: ~A~%" (get 'employee2 'name) (get 'employee2 'rank))

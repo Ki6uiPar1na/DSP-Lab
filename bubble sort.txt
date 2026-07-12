@@ -1,0 +1,10 @@
+bubble_sort(List, Sorted) :-
+    swap(List, NewList), !,
+    bubble_sort(NewList, Sorted).
+bubble_sort(Sorted, Sorted).
+
+% Swap adjacent elements if they are out of order
+swap([X, Y | Tail], [Y, X | Tail]) :-
+    X > Y.
+swap([X | Tail], [X | NewTail]) :-
+    swap(Tail, NewTail).

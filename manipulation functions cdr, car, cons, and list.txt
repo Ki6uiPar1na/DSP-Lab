@@ -1,0 +1,8 @@
+(defun basic-manipulation ()
+  (let ((my-list '(a b c)))
+    (format t "CAR (First element): ~A~%" (car my-list))
+    (format t "CDR (Tail elements): ~A~%" (cdr my-list))
+    (format t "CONS (Prepend element): ~A~%" (cons 'x my-list))
+    (format t "LIST (Create new list): ~A~%" (list 'a 'b 'c))))
+
+(basic-manipulation)

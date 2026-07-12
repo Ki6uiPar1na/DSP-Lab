@@ -1,0 +1,12 @@
+% Base cases
+fib(0, 0).
+fib(1, 1).
+
+% Recursive case
+fib(N, Result) :-
+    N > 1,
+    N1 is N - 1,
+    N2 is N - 2,
+    fib(N1, R1),
+    fib(N2, R2),
+    Result is R1 + R2.
