@@ -1,18 +1,18 @@
 #include <iostream>
 #include <string>
-#include <cctype>
 
 using namespace std;
 
-string encryptVigenere(string text, string key) {
+string encryptVigenere(string plaintext, string key) {
     string ciphertext = "";
     int keyIdx = 0;
-    for (char c : text) {
+    for (char &c : plaintext) {
         if (isalpha(c)) {
             char base = isupper(c) ? 'A' : 'a';
             char keyBase = isupper(key[keyIdx % key.length()]) ? 'A' : 'a';
-            int shift = toupper(key[keyIdx % key.length()]) - 'A';
-            ciphertext += (c - base + shift) % 26 + base;
+            int k = key[keyIdx % key.length()] - keyBase;
+            
+            ciphertext += ((c - base + k) % 26) + base;
             keyIdx++;
         } else {
             ciphertext += c;
@@ -21,14 +21,19 @@ string encryptVigenere(string text, string key) {
     return ciphertext;
 }
 
-string decryptVigenere(string text, string key) {
+string decryptVigenere(string ciphertext, string key) {
     string plaintext = "";
     int keyIdx = 0;
-    for (char c : text) {
+    for (char &c : ciphertext) {
         if (isalpha(c)) {
             char base = isupper(c) ? 'A' : 'a';
-            int shift = toupper(key[keyIdx % key.length()]) - 'A';
-            plaintext += (c - base - shift + 26) % 26 + base;
+            char keyBase = isupper(key[keyIdx % key.length()]) ? 'A' : 'a';
+            int k = key[keyIdx % key.length()] - keyBase;
+            
+            int val = (c - base - k) % 26;
+            if (val < 0) val += 26;
+            
+            plaintext += val + base;
             keyIdx++;
         } else {
             plaintext += c;
@@ -38,15 +43,12 @@ string decryptVigenere(string text, string key) {
 }
 
 int main() {
-    string text = "GEEKSFORGEEKS";
-    string key = "AYUSH";
+    string msg = "ATTACK AT DAWN";
+    string key = "LEMON";
     
-    string encrypted = encryptVigenere(text, key);
-    string decrypted = decryptVigenere(encrypted, key);
-    
-    cout << "--- Vigenere Cipher ---" << endl;
-    cout << "Original:  " << text << endl;
-    cout << "Encrypted: " << encrypted << endl;
-    cout << "Decrypted: " << decrypted << endl;
+    string cipher = encryptVigenere(msg, key);
+    cout << "Vigenere Cipher:\n";
+    cout << "Ciphertext: " << cipher << endl;
+    cout << "Decrypted:  " << decryptVigenere(cipher, key) << "\n\n";
     return 0;
 }

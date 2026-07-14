@@ -1,58 +1,69 @@
 #include <iostream>
-#include <cmath>
+#include <vector>
 
 using namespace std;
 
-// Greatest common divisor
-long long gcd(long long a, long long b) {
-    while (b) {
-        a %= b;
-        swap(a, b);
+// Extended Euclidean Algorithm
+long long extGCD(long long a, long long b, long long &x, long long &y) {
+    if (b == 0) {
+        x = 1; y = 0;
+        return a;
     }
-    return a;
+    long long x1, y1;
+    long long gcd = extGCD(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - y1 * (a / b);
+    return gcd;
 }
 
-// Modular exponentiation: (base^exp) % mod
-long long power(long long base, long long exp, long long mod) {
+// Modular inverse
+long long modInverse(long long e, long long phi) {
+    long long x, y;
+    extGCD(e, phi, x, y);
+    return (x % phi + phi) % phi;
+}
+
+// Modular Exponentiation (base^exp) mod mod
+long long powerMod(long long base, long long exp, long long mod) {
     long long res = 1;
     base = base % mod;
     while (exp > 0) {
         if (exp % 2 == 1) res = (res * base) % mod;
-        exp = exp >> 1;
         base = (base * base) % mod;
+        exp /= 2;
     }
     return res;
 }
 
 int main() {
-    // Choose two prime numbers
-    long long p = 61;
-    long long q = 53;
-    long long n = p * q;
-    long long phi = (p - 1) * (q - 1);
+    // 1. Pick primes
+    long long p = 3;
+    long long q = 11;
     
-    // Choose e such that 1 < e < phi and coprime with phi
-    long long e = 17;
-    while (e < phi) {
-        if (gcd(e, phi) == 1) break;
-        e++;
-    }
+    // 2. Compute modulus n
+    long long n = p * q; // 33
     
-    // Calculate private key d (multiplicative inverse of e mod phi)
-    long long d = 1;
-    while ((d * e) % phi != 1) {
-        d++;
-    }
+    // 3. Compute Totient phi(n)
+    long long phi = (p - 1) * (q - 1); // 20
     
-    long long message = 42; // Numerical message
-    long long encrypted = power(message, e, n);
-    long long decrypted = power(encrypted, d, n);
+    // 4. Choose public exponent e (must be coprime to 20)
+    long long e = 7;
     
-    cout << "--- RSA Cryptosystem ---" << endl;
-    cout << "Public Key:  {" << e << ", " << n << "}" << endl;
-    cout << "Private Key: {" << d << ", " << n << "}" << endl;
-    cout << "Original:    " << message << endl;
-    cout << "Encrypted:   " << encrypted << endl;
-    cout << "Decrypted:   " << decrypted << endl;
+    // 5. Calculate private exponent d
+    long long d = modInverse(e, phi); // 3
+    
+    long long message = 2;
+    
+    // Encryption: C = M^e mod n
+    long long cipher = powerMod(message, e, n);
+    // Decryption: M = C^d mod n
+    long long decrypted = powerMod(cipher, d, n);
+    
+    cout << "RSA Cryptosystem:\n";
+    cout << "Public Key: (" << e << ", " << n << ")\n";
+    cout << "Private Key: (" << d << ", " << n << ")\n";
+    cout << "Ciphertext: " << cipher << endl;
+    cout << "Decrypted:  " << decrypted << "\n\n";
+    
     return 0;
 }

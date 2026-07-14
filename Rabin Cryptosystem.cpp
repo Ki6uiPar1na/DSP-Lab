@@ -1,86 +1,82 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-// Modular exponentiation: (base^exp) % mod
-long long power(long long base, long long exp, long long mod) {
+// Extended Euclidean Algorithm to find modular inverse coefficients
+long long extGCD(long long a, long long b, long long &x, long long &y) {
+    if (b == 0) {
+        x = 1;
+        y = 0;
+        return a;
+    }
+    long long x1, y1;
+    long long gcd = extGCD(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - y1 * (a / b);
+    return gcd;
+}
+
+// Modular Exponentiation: (base^exp) mod mod
+long long powerMod(long long base, long long exp, long long mod) {
     long long res = 1;
     base = base % mod;
     while (exp > 0) {
         if (exp % 2 == 1) res = (res * base) % mod;
-        exp = exp >> 1;
         base = (base * base) % mod;
+        exp /= 2;
     }
     return res;
 }
 
-// Extended Euclidean Algorithm to solve a*x + b*y = gcd(a, b)
-void extgcd(long long a, long long b, long long &x, long long &y) {
-    if (b == 0) {
-        x = 1; y = 0;
-        return;
-    }
-    long long x1, y1;
-    extgcd(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - (a / b) * y1;
+// Encryption: C = m^2 mod n
+long long encryptRabin(long long m, long long n) {
+    return (m * m) % n;
+}
+
+// Decryption produces 4 roots (CRT)
+vector<long long> decryptRabin(long long C, long long p, long long q) {
+    long long n = p * q;
+    
+    // Step 1: Modular Square Roots mod p and mod q (using shortcut p, q == 3 mod 4)
+    long long r = powerMod(C, (p + 1) / 4, p);
+    long long s = powerMod(C, (q + 1) / 4, q);
+    
+    // Step 2: Use Extended GCD to find c, d such that c*p + d*q = 1
+    long long c, d;
+    extGCD(p, q, c, d);
+    
+    // Step 3: Compute the 4 roots using CRT
+    long long r1 = (r * d * q + s * c * p) % n;
+    if (r1 < 0) r1 += n;
+    
+    long long r2 = n - r1;
+    
+    long long r3 = (r * d * q - s * c * p) % n;
+    if (r3 < 0) r3 += n;
+    
+    long long r4 = n - r3;
+    
+    return {r1, r2, r3, r4};
 }
 
 int main() {
-    // User Provided Parameters
+    // Private Key (Primes congruent to 3 mod 4)
     long long p = 7;
     long long q = 11;
-    long long n = p * q; // Public key n = 77
-    long long m = 20;    // Original Plaintext
+    long long n = p * q; // Public Key modulus
     
-    cout << "--- Rabin Cryptosystem Verification ---" << endl;
-    cout << "Primes: p = " << p << ", q = " << q << " (Both congruent to 3 mod 4)" << endl;
-    cout << "Public Key (n): " << n << endl;
-    cout << "Original Plaintext (M): " << m << "\n\n";
+    long long m = 20; // Plaintext message
     
-    // --- ENCRYPTION ---
-    // C = M^2 mod n
-    long long c = (m * m) % n;
-    cout << "[Encryption] Computed Ciphertext (C) = " << c << "\n\n";
+    long long cipher = encryptRabin(m, n);
+    cout << "Rabin Cryptosystem:\n";
+    cout << "Ciphertext: " << cipher << endl;
     
-    // --- DECRYPTION ---
-    // Find square roots of C modulo p and modulo q
-    long long r = power(c, (p + 1) / 4, p);
-    long long s = power(c, (q + 1) / 4, q);
-    
-    // Use Extended Euclidean Algorithm to find CRT coefficients
-    long long yp, yq;
-    extgcd(p, q, yp, yq);
-    
-    // Calculate the 4 distinct square roots modulo n
-    long long d1 = (yp * p * s + yq * q * r) % n;
-    long long d2 = (yp * p * s - yq * q * r) % n;
-    long long d3 = (-yp * p * s + yq * q * r) % n;
-    long long d4 = (-yp * p * s - yq * q * r) % n;
-    
-    // Normalize negative results to stay within [0, n-1]
-    long long roots[4];
-    roots[0] = (d1 + n) % n;
-    roots[1] = (d2 + n) % n;
-    roots[2] = (d3 + n) % n;
-    roots[3] = (d4 + n) % n;
-    
-    cout << "[Decryption] The 4 mathematically valid plaintext options are:" << endl;
-    bool foundMatch = false;
-    for (int i = 0; i < 4; i++) {
-        cout << "  Option " << i + 1 << ": " << roots[i];
-        if (roots[i] == m) {
-            cout << " <-- MATCHES YOUR ORIGINAL PLAINTEXT!";
-            foundMatch = true;
-        }
-        cout << endl;
+    vector<long long> decrypted = decryptRabin(cipher, p, q);
+    cout << "The 4 possible decrypted plaintexts are: ";
+    for (long long val : decrypted) {
+        cout << val << " ";
     }
-    
-    if (foundMatch) {
-        cout << "\nSUCCESS: The original message was successfully recovered!" << endl;
-    } else {
-        cout << "\nFAILURE: Message not found." << endl;
-    }
-    
+    cout << "\n\n";
     return 0;
 }
