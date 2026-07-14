@@ -1,6 +1,0 @@
-% Predicate to write content to a file
-write_to_file(FileName) :-
-    tell(FileName),                      % Open file for writing
-    write('hello_world.'), nl,           % Write a Prolog term followed by a newline
-    write('prolog_file_handling.'), nl,  % Write another term
-    told.                                % Close the file stream

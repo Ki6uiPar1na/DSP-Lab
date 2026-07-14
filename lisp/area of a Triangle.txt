@@ -1,5 +1,0 @@
-(defun triangle-area (base height)
-  (* 0.5 base height))
-
-;; Example usage:
-(format t "Area of triangle (Base=10, Height=5): ~A~%" (triangle-area 10 5))

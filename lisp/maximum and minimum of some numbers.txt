@@ -1,7 +1,0 @@
-(defun find-max-min (num-list)
-  (let ((max-val (apply #'max num-list))
-        (min-val (apply #'min num-list)))
-    (list max-val min-val)))
-
-;; Example usage:
-(format t "Max and Min: ~A~%" (find-max-min '(5 12 3 8 21 1)))

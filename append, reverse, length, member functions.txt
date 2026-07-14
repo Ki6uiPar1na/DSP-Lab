@@ -1,9 +1,0 @@
-(defun verify-operations ()
-  (let ((list1 '(a b c))
-        (list2 '(d e)))
-    (format t "APPEND: ~A~%" (append list1 list2))
-    (format t "REVERSE: ~A~%" (reverse list1))
-    (format t "LENGTH: ~A~%" (length list1))
-    (format t "MEMBER (find b): ~A~%" (member 'b list1))))
-
-(verify-operations)

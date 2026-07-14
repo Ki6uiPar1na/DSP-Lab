@@ -1,6 +1,0 @@
-% Base case: if the head matches the element, the tail is the result
-delete_elem(X, [X | Tail], Tail).
-
-% Recursive case
-delete_elem(X, [Head | Tail], [Head | ResultTail]) :-
-    delete_elem(X, Tail, ResultTail).
